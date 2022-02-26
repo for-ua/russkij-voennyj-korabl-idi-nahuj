@@ -12,6 +12,9 @@ Chrome:
 Other browsers:
 Feel free to make a code commit.
 
+### Github Pages
+Project can not be run in such settings. Download the code and run it on your localhost.
+
 ### Disclaimer / Warning
 
 All the contents of this repository should be used for authorized and/or educational purposes only. Any misuse of this repository will not be the responsibility of the author or of any other collaborator.
