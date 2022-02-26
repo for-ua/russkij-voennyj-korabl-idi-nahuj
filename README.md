@@ -1,4 +1,4 @@
-# russkij-voennyj-korabl-idi-nahuj
+# Russkij voennyj korabl idi nahuj
 ### Volunteer DDoS tool via HTML + JS
 
 Running the HTML locally on your device will create a distributed DDoS attack on Russian websites, through complete volunteering.
